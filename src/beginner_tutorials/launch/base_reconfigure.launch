@@ -1,0 +1,45 @@
+<launch>
+
+<rosparam param="base_width">0.5</rosparam>
+<rosparam param="ticks_meter">0.06 </rosparam>
+<rosparam param="map_vel">0.3 </rosparam>
+
+<node pkg="beginner_tutorials" type="joy2twist" name="joy2twist" output="screen"/>
+
+
+<!--node name="base_node" pkg="beginner_tutorials" type="base_node.py"-->
+<!--rosparam file="$(find beginner_tutorials)/param/board_base_config.yaml" command="load" /-->
+<!--/node-->
+
+
+
+<node pkg="dynamic_tutorials" type="vel_node" name="l_vel" output="screen">
+
+<remap from ="lec" to="left_lec"/> 
+<remap from ="offset" to="left_offset"/> 
+<remap from ="vel_des" to="left_vel_des"/>
+
+<remap from ="ang" to="left_pos"/> 
+<remap from ="vel" to="left_vel"/> 
+<remap from ="out" to="left_out"/>
+
+</node>
+
+<node pkg="dynamic_tutorials" type="vel_node" name="r_vel" output="screen">
+
+<remap from ="lec" to="right_lec"/> 
+<remap from ="offset" to="right_offset"/> 
+<remap from ="vel_des" to="right_vel_des"/>
+
+<remap from ="ang" to="right_pos"/> 
+<remap from ="vel" to="right_vel"/> 
+<remap from ="out" to="right_out"/>
+
+</node>
+
+
+<node pkg="beginner_tutorials" type="twist2motor" name="twist2motor" output="screen"/>
+
+<!--node pkg="beginner_tutorials" type="diff_odom" name="diff_odom" output="screen"/--> 
+
+</launch>

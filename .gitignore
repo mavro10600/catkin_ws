@@ -1,0 +1,16 @@
+git/
+tmp/
+trash/
+maps/
+ftz/
+stubs/
+**/bin/
+**/build/
+**/devel/
+**/install/
+*~
+**~
+**/*~
+**/**~
+**.pyc
+./catkin_ws/src/rosserial_tivac/

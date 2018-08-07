@@ -1,0 +1,56 @@
+Documentacion nodos de la base para hacer los remap en el launchfile
+
+base_node.py
+
+Publicadores
+serial_base string
+right_lec int16
+left_lec int16
+flipper1_reset
+flip1_lec
+flipper2_reset
+flip2_lec
+flipper3_reset
+flip3_lec
+flipper4_reset
+flip4_lec
+
+Suscriptores
+
+left_out
+right_out
+flipper1_out
+flipper2_out
+flipper3_out
+flipper4_out
+
+----------------------------------------------------------
+joy2twist
+
+Publicadores 
+
+suscriptores
+
+----------------------------------------------------------
+
+twist2motors
+
+publicadores
+
+suscriptores
+
+----------------------------------------------------------
+
+twist2flippers
+
+publicadores
+
+suscriptores
+
+----------------------------------------------------------
+
+twist2arm
+
+publicadores 
+
+suscritores

@@ -1,0 +1,12 @@
+http://wiki.ros.org/ROSNodeTutorialC%2B%2B
+
+1. Esscribir un  Publicador/Subscriptor con dynamic reconfigure y Parameter Server
+
+Como crear un publicador que:
+	Inicialice varias variable sdesde un launch file o usando la linea de comandos utilizando el parameter server
+	Haga varias variables disponibles a ser modificadas durante tiempo de ejecucion usando dynamic reconfigure server
+	Publique datos en un topico usando menssages hechos a la medida
+Un suscriptor que trabaje con elm publicador y que haga :
+	Ser un subscriber que escuche el mensaje hecho a la medida en el topico especificado e imprima los datos del message
+	
+

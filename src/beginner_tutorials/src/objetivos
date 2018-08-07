@@ -1,0 +1,78 @@
+Entonces la idea seria tener un programa que tome las variables del control de xbox y las ttraduzca en vectores o cuaterniones de manera que se conecte a los otros nodos. UN ejemplo seria tomar la palanca de control de la base y convertirlo a un cuaternion y usando otro programa que tome como entrada dicho cuaternion se traduzca en instrucciones de velocidad para los nodos de control pid.
+
+En otras palancas y usando una combinacion de botones para mover los flippers
+
+
+En otra palanca del joystick definir por ejemplo la derecha,definir el movimiento deseado en ejes, definir un sistema de cooredenadas y dar un vector de posicion por ejemplo, para mover las tres primeras juntas del brazo.aunque seria un mapeo de dos dimensiones a tres dimensiones. quizas hay que pensarlo bien. Si usara dos palancas, seria un mapeo de cuatro grados de libertad a tres grados de libertad. Otra opcion es resolver la cinematica del brazo en x y y y si se presiona un boton , RB o algo asi, se mueve en z. Entonces, para el movimineot en x y por ejemplo, seria el movimiento en dos dimensiones pero moviendo las tres juntas de revolucion . en ambos caso, es interesante de hecho.El punto es que el vector de salida va a ser en X, y , 0 , 0, 0,0. y otro nodo va a resolver la cinematica inversa.
+
+Luego, tenemos que si presionamos el boton RB y movemos el stick arriba y abajo, va a ser el movimiento en Z, usando solamente dos juntas de revolucion se resolveria dicha cinematica. Y si se mueve lateralmente seria en x el movimiento. El vector de salida estaria entonces en x,0,z,0,0,0. 
+
+Y coneso ya definimos elk nodo del joystick.
+de ahi se derivan los nodos de control de la base, los de la cinematica que traducen del espacio de R3 al espacio de juntas, Y de ahi deberian ir a nodos de control de posicion en las juntas, sin embargo, habra que probar primero sin control ,ya que las juntas del robot son muy estables, y probar directamente que tal funciona. Quizas solamente el nodo de la base requiera control, el de hombro y codo no lo creo. Y los flippers funcionan bien tener salidas a motor directamente.
+
+En cuanto a las juntas de la muñeca, hay otros tres grados de libertad. Pero ahi hay que resolver la orientacion.
+Quizas simplemente lo deje en mover junta a junta por el momento, me lo voy a pensar.
+
+Ademas de todo esto, quizas hay que definir un nodo que controle la cinematica de los elementos que pueden colisionar, lo que es mas importante, es el choque entre los flippers delanteros y el brazo. Esto quizas lo logre definiendo campos potenciales. Y hay que hacer un nodo que precisamente tome como entradas las posiciones de los flippers delanteros y la posicion del brazo ne el espacio y encontrar en que regiones van a colisionar dada su actual trayectoria.Son dos casos, primero , si quiero mover el flipper delantero derecho, por ejemplo, se ectiva un servicio que toma como entrada la actual posicion del brazo, tomando las posiciones de los encoder calcula la cinematica directa por ejemplo y se calcula la posicion del codo , del encoder del flipper que se va a mover se calcula su posicion y si la resta de dicha posicion con la del codo es menor a cierto valor, se modifica el valor de salida al motor a cero.
+
+17/oct/2017
+
+
+Hasta aqui llevo los progrmas de 
+encoder.cpp
+joy2twist.cpp
+twist2motor.cpp
+teleoperation_flipers.cpp
+control_motor.cpp
+diff_odom.cpp
+
+con estos programas, exceptuando teleoperation flippers,junto con el de base_launchpad.py se puede mover la base diferencial del Finderusnado un control pid en las ruedas y un control por par diferencial usando el joystick. Ahora, de aqui en adelante seria buena idea pasar a parametros todo, es deir, dentro de cada programa, usar la funcions getparam para que jale los parametros del robot de un archivo de texto externo. apero de eso me encargo mañana, ademas de eso, hay que entender bien el funcionamiento de el programa twist2motor.cpp y comentar el codigo lo mejor que se pueda.
+
+
+
+1/nov/2017
+
+Hasta ahora ya tengo un entendimiento bastante bueno de como hacer un control pid para un actuador usando como entradas un encoder ycomo salida un comando de control ademas de valores de posicion y velocidad del mismo.
+
+Ademas de los nodos de odometria que jalan muy bien.
+
+Lo que sigue a continuacion son dos cosas:
+
+-La pirmera seria tener bien un launch file que lance la base, lo unico que falta en este supuesto, es agregar al nodo de joy2twist el control de los flippers y clbrar el control pid de las orugas de traccion.
+
+-Una vez logrado esto, lo siguiente seria agregar dynamic_reconfigure alos controles pid y aprender a usarlo tambien en el uso de los finales de carrera. Ademas de esto, crear el urdf del robot y unir usando robot state publisher, y agregar el laser y tenr slam en la base.
+
+
+11/nov /2017
+
+El primer objetivo ya esta listo ,faltainvestigar el uso de dynamic reconfigure solamente.
+
+7/marzo/2018
+Me pelee con los sensores de la mpu y del efector final, pero ya estan listos.
+
+16/abril/2018
+Cambie las placas de traccion y brazo, recableé la traccion, los nodos de control de velocidad PID, ahora entran por parámetro, a pesar que ya funciona los nodos de reconfiguracion dinamica, no he podido adaptarlos a los nodos de control PID, aun me falta entender completamente como funciona.
+Elí me propuso agregar un perfil de velocidad para controlar mejor la dinamica de la tracción
+También por alguna razon los encoders ya no jalan, debera de hacer varios nuevos. Ahora sigue hacer los nodos de control de posicion del brazo y probablemente tod salga bien.
+
+24 abril 2018
+Utilizando dynamic reconfigure he logrado hacer que los nodos de control de velocidad pid tengan reconfiguracion dinamica de las constantes de control kp, ki y kd. No obstante, creo que aun podria agregar como parametro de reconfiguracion dinamica el rate o frecuencia a la ue se ejecuta el nodo. Tambien convendría hacer investigacion en la implementacion completa usando timers, esto en la descripcion de roscpp Nodehandle y como configurar el spinOnce de forma separada. Eso quizas la proxima persona que tome el finder podría implementarlo.
+
+Falta aun hacer entonces la biblioteca del nodo de control de posicion, y ver como implementar el perfil de velocidad.
+
+27 mayo 2018
+
+La biblioteca de control de posicion ya está hecha, tanto para las juntas del brazo como de la muñeca, y ahora trabajo en la implementación del nodo de control del brazo, que convierte el mensaje tipo Twist del nodo joy2twist a los valores de posicion deseada de las juntas.
+
+EL problema, radica ne hacer un control de desplazamiento, limitado por una función que calcule continuamente el Jacobiano en el espacio de juntas, de manera que el robo no llegue a una posicion crítica, además del jacobiano, conviene tambien revisar los finales de carrera y los limites por software de cada junta.
+
+No obstante, el primero porblema, es hacer un nodo que tome como entrada un mensaje tipo twist y lo convierta en posiciones deseadas en las juntas del robot.
+Lo mas inteligente que se me ocurre, es hacer dos nodos, ambos con la misma entrada, el mensaje tipo twist, pero uno enfocado a convertir la parte lineal (coordenadas cartesianas) a las posiciones deseadas de las primeras tres juntas del robot, y el otro programa toma la orientación angular del mensaje tipo twist y la transforma en desplazamientos de las ultimas tres juntas de revolucion correspondientes a la muñeca.
+
+Para este fin, primero me voy a echar el tutorial del paquete TF de ros, el cual se encarga de simplificar el manejo de coordenadas y transfomaciones, ya que hay que transfomar primero el desplazamiento deseado del efector final en el espacio de juntas del robot, y luego transformar del espacio de juntas del robot a las posiciones deseadas de las juntas.
+
+6 agosto 2018
+Ya hice funcionar correctamente el modulo de traccion con sus controles PID en las orugas de tracción, pero ahora, digamos que hay dos problemas, el primero, es con el encoder, que no está teniendo continuidad en la suma de la posicion, creo que es debido al tiempo, que las condiciones de suma de vuelta no se dan, falta debuguear se asunto, además de ello, el control PID debe de mejorar un poco en cuano a los valores que se usan para operar, ya que son a veces algo dispares.
+
+Tambien un objetivo 	que me he planteado, es agregar un sensor de voltaje para agregar dicha señal al control de los motores, ya que hay una zona donde ya no tiene ninguncaso mover el robot si el voltaje es demasiado bajo.
+

@@ -1,0 +1,22 @@
+<node pkg="beginner_tutorials" type="vel_ctrl" name="r_vel" output="screen">
+
+<remap from ="lec" to="right_lec"/> 
+<remap from ="offset" to="right_offset"/> 
+<remap from ="pos_des" to="right_pos_des"/>
+
+<remap from ="ang" to="right_pos"/> 
+<remap from ="vel" to="right_vel"/> 
+<remap from ="out" to="right_out"/>
+
+<rosparam param ="kp_vel">70</rosparam>
+<rosparam param ="ki_vel">10</rosparam>
+<rosparam param ="kd_vel">0</rosparam>
+<rosparam param ="km_vel">20</rosparam>
+<rosparam param ="umbral_vel">0.2</rosparam>
+<rosparam param ="range_vel">100</rosparam>
+<rosparam param ="kierr_vel">0.2</rosparam>
+<rosparam param ="kimax_vel">100</rosparam>
+<rosparam param ="kisum_vel">0</rosparam>
+<rosparam param ="error_vel">0</rosparam>
+
+</node>
