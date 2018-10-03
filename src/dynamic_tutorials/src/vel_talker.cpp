@@ -39,7 +39,7 @@ namespace node_vel
 	ROS_INFO("started PID_node");
 
 
-	wheel_sub=nh_.subscribe("lec",10,&vel_PID::encoderCb,this);
+	wheel_sub=nh_.subscribe("lec",1,&vel_PID::encoderCb,this);
 	offsetSub=nh_.subscribe("offset",10,&vel_PID::offsetCb,this);
 	vel_desSub=nh_.subscribe("vel_des",10,&vel_PID::desCb,this);
 	

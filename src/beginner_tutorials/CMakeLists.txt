@@ -141,8 +141,13 @@ include_directories(
 #add_executable(teleoperation_base src/teleoperation_base.cpp)
 add_executable(encoder src/encoder.cpp)
 add_executable(joy2twist src/joy2twist.cpp)
+
+add_executable(joy2twist_brazo src/joy2twist_brazo.cpp)
+
 #add_executable(control_motor src/control_motor.cpp)
 add_executable(twist2motor src/twist2motor.cpp)
+
+
 add_executable(diff_odom src/diff_odom.cpp)
 add_executable(pid_control src/pid_control.cpp)
 add_executable(vel_ctrl src/vel_ctrl.cpp)
@@ -170,6 +175,9 @@ add_executable(ballbot_gabriel src/ballbot/ballbot_gabriel.cpp)
  #target_link_libraries(teleoperation_base   ${catkin_LIBRARIES} )
  target_link_libraries(encoder   ${catkin_LIBRARIES} )
  target_link_libraries(joy2twist ${catkin_LIBRARIES})
+ 
+  target_link_libraries(joy2twist_brazo ${catkin_LIBRARIES})
+ 
 # target_link_libraries(control_motor ${catkin_LIBRARIES})
   target_link_libraries(twist2motor ${catkin_LIBRARIES})
   target_link_libraries(diff_odom ${catkin_LIBRARIES})
