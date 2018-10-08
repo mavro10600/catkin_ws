@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(beginner_tutorials)
+project(nodelet_hello_world)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,14 +8,9 @@ project(beginner_tutorials)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  geometry_msgs
-  #move_base_msgs
-  nav_msgs
-  tf
   nodelet
+  roscpp
+  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -37,10 +32,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
 ## * In the file package.xml:
 ##   * add a build_depend tag for "message_generation"
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
+##   * add a build_depend and a exec_depend tag for each package in MSG_DEP_SET
 ##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
 ##     but can be declared for certainty nonetheless:
-##     * add a run_depend tag for "message_runtime"
+##     * add a exec_depend tag for "message_runtime"
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
 ##     find_package(catkin REQUIRED COMPONENTS ...)
@@ -85,7 +80,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## To declare and build dynamic reconfigure parameters within this
 ## package, follow these steps:
 ## * In the file package.xml:
-##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
+##   * add a build_depend and a exec_depend tag for "dynamic_reconfigure"
 ## * In this file (CMakeLists.txt):
 ##   * add "dynamic_reconfigure" to
 ##     find_package(catkin REQUIRED COMPONENTS ...)
@@ -103,14 +98,14 @@ find_package(catkin REQUIRED COMPONENTS
 ###################################
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
+## INCLUDE_DIRS: uncomment this if your package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-  LIBRARIES beginner_tutorials
-  CATKIN_DEPENDS roscpp rospy std_msgs nodelet
+  LIBRARIES nodelet_hello_world
+  CATKIN_DEPENDS nodelet roscpp std_msgs
 #  DEPENDS system_lib
 )
 
@@ -126,8 +121,8 @@ include_directories(
 )
 
 ## Declare a C++ library
- add_library(nodelet_mavro
-   src/hello_mavro.cpp
+ add_library(nodelet_hello_world
+   src/hello_world.cpp
  )
 
 ## Add cmake target dependencies of the library
@@ -138,24 +133,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/beginner_tutorials_node.cpp)
-#add_executable(teleoperation_base src/teleoperation_base.cpp)
-add_executable(encoder src/encoder.cpp)
-add_executable(joy2twist src/joy2twist.cpp)
+# add_executable(${PROJECT_NAME}_node src/nodelet_hello_world_node.cpp)
 
-add_executable(joy2twist_brazo src/joy2twist_brazo.cpp)
-
-#add_executable(control_motor src/control_motor.cpp)
-add_executable(twist2motor src/twist2motor.cpp)
-
-
-add_executable(diff_odom src/diff_odom.cpp)
-add_executable(pid_control src/pid_control.cpp)
-add_executable(vel_ctrl src/vel_ctrl.cpp)
-add_executable(vel1_ballbot src/ballbot/vel1_ballbot.cpp)
-add_executable(vel2_ballbot src/ballbot/vel2_ballbot.cpp)
-add_executable(vel3_ballbot src/ballbot/vel3_ballbot.cpp)
-add_executable(ballbot_gabriel src/ballbot/ballbot_gabriel.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -165,29 +144,12 @@ add_executable(ballbot_gabriel src/ballbot/ballbot_gabriel.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#add_dependencies(teleoperation_base)
-
-
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(nodelet_mavro
+ target_link_libraries(nodelet_hello_world
    ${catkin_LIBRARIES}
  )
- #target_link_libraries(teleoperation_base   ${catkin_LIBRARIES} )
- target_link_libraries(encoder   ${catkin_LIBRARIES} )
- target_link_libraries(joy2twist ${catkin_LIBRARIES})
- 
-  target_link_libraries(joy2twist_brazo ${catkin_LIBRARIES})
- 
-# target_link_libraries(control_motor ${catkin_LIBRARIES})
-  target_link_libraries(twist2motor ${catkin_LIBRARIES})
-  target_link_libraries(diff_odom ${catkin_LIBRARIES})
-  target_link_libraries(pid_control ${catkin_LIBRARIES})
-  target_link_libraries(vel_ctrl ${catkin_LIBRARIES})
-  target_link_libraries(vel1_ballbot ${catkin_LIBRARIES})
-  target_link_libraries(vel2_ballbot ${catkin_LIBRARIES})
-  target_link_libraries(vel3_ballbot ${catkin_LIBRARIES})
-  target_link_libraries(ballbot_gabriel ${catkin_LIBRARIES})
+
 #############
 ## Install ##
 #############
@@ -228,7 +190,7 @@ add_executable(ballbot_gabriel src/ballbot/ballbot_gabriel.cpp)
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_beginner_tutorials.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_nodelet_hello_world.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

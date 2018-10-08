@@ -1,0 +1,7 @@
+<library path="/home/mavro/catkin_ws/devel/lib/libnodelet_mavro">
+	<class name="nodelet_mavro/Hello" type="nodelet_mavro::Hello" base_class_type="nodelet::Nodelet">
+			<description>
+			A node to republish a message by mavro
+			</description>
+	</class>
+</library>
