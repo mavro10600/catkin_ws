@@ -89,6 +89,8 @@ Loop
 #define endstopElbow1 PB_4
 #define endstopElbow2 PE_5
 
+#define pinCytronDir PC_4
+#define pinCytronPwm PC_5
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //(pinpwm1,pinpwm2,umbral, maxpwmsense)
@@ -129,6 +131,9 @@ float SecondsSinceLastUpdate=0;
 int shoulder_out=0;
 int elbow_out=0;
 int base_out=0;
+int roll_out=0;
+int pitch_out=0;
+int yaw_out=0;
 ///////////////////////////////////////////////////////////////////
 //Variables de los encoders
 int stat_complete=0;
@@ -183,7 +188,7 @@ Wire.begin();
   //roboclaw.begin(38400);
   Serial2.begin(38400);
   //rc.begin(38400);
-  //Serial3.begin(38400);
+  Serial3.begin(38400);
   //SetupEncoders();
   
   SetupMotors();
@@ -206,6 +211,11 @@ void SetupMotors()
 {
   //Para los OSMC
  base.attach(PB_3);
+
+  pinMode(pinCytronPwm,OUTPUT);
+  pinMode(pinCytronDir,OUTPUT);
+  digitalWrite(pinCytronDir,LOW);
+  digitalWrite(pinCytronPwm,LOW);
 }
 
 void SetupReset()
@@ -331,6 +341,9 @@ void Set_Speed()
     base_out=Messenger_Handler.readLong();
     shoulder_out=Messenger_Handler.readLong();
     elbow_out=Messenger_Handler.readLong();
+    roll_out=Messenger_Handler.readLong();
+    pitch_out=Messenger_Handler.readLong();
+    yaw_out=Messenger_Handler.readLong();
     //Serial.print("Set_speed_funct");
     
      //TODO 
@@ -380,9 +393,17 @@ elbow_lec=0;
 
  Serial.print("e");
   Serial.print("\t");
+  Serial.print(base_out);
+  Serial.print("\t");
   Serial.print(shoulder_out);
   Serial.print("\t");
   Serial.print(elbow_out);
+  Serial.print("\t");
+  Serial.print(roll_out);
+  Serial.print("\t");
+  Serial.print(pitch_out);
+  Serial.print("\t");
+  Serial.print(yaw_out);
   Serial.print("\n");
 }
 
@@ -432,6 +453,18 @@ if (endstp_elbow==true)
 Serial2.write(192+elbow_out);
 
 /////////////////////////////////////////////////////////////////////////
+
+Serial3.write(64+roll_out);
+
+/////////////////////////////////////////////////////////////////////////
+
+Serial3.write(192+yaw_out);
+
+/////////////////////////////////////////////////////////////////////////
+
+int pitch_temp=map(abs(pitch_out),0,500,0,127);
+digitalWrite(pinCytronDir,(pitch_out < 0) ? HIGH : LOW);
+analogWrite(pinCytronPwm,pitch_temp);
 
 }
 
