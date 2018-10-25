@@ -89,8 +89,8 @@ Loop
 #define endstopElbow1 PB_4
 #define endstopElbow2 PE_5
 
-#define pinCytronDir PC_4
-#define pinCytronPwm PC_5
+#define pinCytronDir PC_5
+#define pinCytronPwm PC_4
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //(pinpwm1,pinpwm2,umbral, maxpwmsense)
@@ -311,7 +311,7 @@ void OnMssageCompleted()
   {
     
      //This will set the speed
-     Serial.print("Set_speed");
+     //Serial.print("Set_speed");
      Set_Speed();
      return; 
   }
@@ -462,8 +462,9 @@ Serial3.write(192+yaw_out);
 
 /////////////////////////////////////////////////////////////////////////
 
-int pitch_temp=map(abs(pitch_out),0,500,0,127);
-digitalWrite(pinCytronDir,(pitch_out < 0) ? HIGH : LOW);
+int pitch_temp;
+if(pitch_out>0){digitalWrite(pinCytronDir, HIGH); pitch_temp=map(pitch_out,0,500,0,127);}
+if(pitch_out<0){digitalWrite(pinCytronDir, LOW); pitch_temp=map(-pitch_out,0,500,0,127);}
 analogWrite(pinCytronPwm,pitch_temp);
 
 }
