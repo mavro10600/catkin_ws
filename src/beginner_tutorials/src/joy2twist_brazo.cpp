@@ -38,7 +38,9 @@ class RobotDriver
 	ros::Publisher cmd_vel_elbow;
 	ros::Publisher cmd_vel_shoulder;
 	ros::Publisher cmd_vel_base;
-	
+	ros::Publisher cmd_vel_roll;
+	ros::Publisher cmd_vel_pitch;
+	ros::Publisher cmd_vel_yaw;
 ///////////////////////////////////////////////////////	
 	double rate;
 ///////////////////////////////////////////////////////
@@ -67,6 +69,8 @@ class RobotDriver
 	double joy_roll;
 	double joy_pitch;
 	double joy_yaw;
+	bool stat_LBbutton;
+	bool stat_RBbutton;
 //variables asociadas al tiempo
 		ros::Duration t_delta;
 		
@@ -109,12 +113,16 @@ RobotDriver::RobotDriver()
 	cmd_vel_shoulder= n.advertise<std_msgs::Int16>("shoulder_out",1);
 	cmd_vel_elbow= n.advertise<std_msgs::Int16>("elbow_out",1);
 	cmd_vel_base= n.advertise<std_msgs::Int16>("base_out",1);
+	cmd_vel_roll= n.advertise<std_msgs::Int16>("roll_out",1);
+	cmd_vel_pitch= n.advertise<std_msgs::Int16>("pitch_out",1);
+	cmd_vel_yaw= n.advertise<std_msgs::Int16>("yaw_out",1);
 }
 
 void RobotDriver::init_variables()
 {
 	rate=10;
-	
+ stat_LBbutton=false;
+ stat_RBbutton=false;
 ///////////////////////////////////////////
 //variables asociadas a la navegacion
 	joy_h=0;
@@ -138,7 +146,7 @@ void RobotDriver::init_variables()
 	
 	joy_shoulder=0;
 	joy_elbow=0;
-	joy_base=1500;
+	joy_base=0;
 	////////////////////////////////////////////////////////////
 //variable sasociadas al tiempo	
 	
@@ -178,10 +186,32 @@ void RobotDriver::update()
 		
 		std_msgs::Int16 flip1, flip2, flip3,flip4;
 		
-		std_msgs::Int16 should, elb, base;
+		std_msgs::Int16 should, elb, base, roll, pitch, yaw;
 		
 ///////////////////////////////////////////////////////////////////////////////
 //flippers		
+
+		if (!stat_RBbutton && !stat_LBbutton)
+		{
+		joy_flipper1=0;
+		joy_flipper2=0;
+		joy_flipper3=0;
+		joy_flipper4=0;
+		
+		joy_base=0;
+		joy_shoulder=0;
+		joy_elbow=0;
+		joy_roll=0;
+		}		
+		if (!stat_LBbutton)
+		{
+		joy_pitch=0;
+		}
+		if (!stat_RBbutton)
+		{
+		joy_yaw=0;
+		}
+		
 		flip1.data=int(joy_flipper1);
 		flip2.data=int(joy_flipper2);
 		flip3.data=int(joy_flipper3);
@@ -190,6 +220,10 @@ void RobotDriver::update()
 		should.data=int(joy_shoulder);
 		elb.data=int(joy_elbow);
 		base.data=int(joy_base);		
+		roll.data=int(joy_roll);
+		ROS_INFO_STREAM("status: "<<stat_LBbutton);		
+		pitch.data=int(joy_pitch);
+		yaw.data=int(joy_yaw);		
 		
 		//aqui convertir los valores de las variables del joystick a velocidad angular y velocidad en x, el mapeo es de xy a r, theta, del plano a coordenadas polares
 		temp_linear=sqrt(joy_h*joy_h+joy_v*joy_v);
@@ -222,6 +256,9 @@ void RobotDriver::update()
 		cmd_vel_shoulder.publish(should);
 		cmd_vel_elbow.publish(elb);
 		cmd_vel_base.publish(base);
+		cmd_vel_roll.publish(roll);
+		cmd_vel_pitch.publish(pitch);
+		cmd_vel_yaw.publish(yaw);
  		
 /////////////////////////////////////////////////////////////////////////////
 //aqui termina la conversion y se publican los mansajes tipo twist
@@ -237,9 +274,13 @@ void RobotDriver::update()
 void RobotDriver::joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 float sens=0.2;
 
+if (LBbutton)
+{stat_LBbutton=true;}
+
+if (!LBbutton)
+{stat_LBbutton=false;}
 /////////////////////////////////////////////////////////////////////////
 //movimiento de la base
-
 if((LAVstick > sens || LAVstick < -sens ) && !LBbutton && !RBbutton)
 {
 joy_v=LAVstick;
@@ -305,9 +346,18 @@ joy_base=RAVstick*500;
 
 if((RAVstick < sens && RAVstick> -sens) && LBbutton && RBbutton)
 {
-	joy_base=1500;
+	joy_base=0;
 }
 
+if((RAHstick > sens || RAHstick < -sens ) && LBbutton && RBbutton)
+{
+joy_roll=-64*RAVstick;
+}
+
+if((RAHstick < sens && RAHstick> -sens) && LBbutton && RBbutton)
+{
+	joy_roll=0;
+}
 
 //////////////////////////////////////////////////////////////////
 //movimiento del brazo
@@ -356,31 +406,32 @@ if((RAHstick < sens && RAHstick > -sens) && !LBbutton && RBbutton)
 //movimiento roll y pitch
 
 if((LAVstick > sens || LAVstick < -sens) && LBbutton && !RBbutton)
-{joy_pitch=LAVstick;}
+{joy_pitch=LAVstick*500;
+}
 
 if((LAVstick < sens && LAVstick> -sens) && LBbutton && !RBbutton)
 {joy_pitch=0;}
 
 if((LAHstick > sens || LAHstick < -sens) && LBbutton && !RBbutton)
-{joy_roll=-LAHstick;}
+{joy_yaw=64*LAHstick;}
 
 if((LAHstick < sens && LAHstick > -sens) && LBbutton && !RBbutton)
-{joy_roll=0;}
+{joy_yaw=0;}
 
 //movimiento yaw y roll
-
+/*
 if((LAVstick > sens || LAVstick < -sens) && !LBbutton && RBbutton)
-{joy_yaw=LAVstick;}
+{joy_yaw=64*LAVstick;}
 
 if((LAVstick < sens && LAVstick> -sens) && !LBbutton && RBbutton)
 {joy_yaw=0;}
 
 if((LAHstick > sens || LAHstick < -sens) && !LBbutton && RBbutton)
-{joy_roll=-LAHstick;}
+{joy_roll=-64*LAHstick;}
 
 if((LAHstick < sens && LAHstick > -sens) && !LBbutton && RBbutton)
 {joy_roll=0;}
-
+*/
 
 }
 
