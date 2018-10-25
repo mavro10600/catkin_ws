@@ -75,15 +75,13 @@ include_directories(
 )
 
 ## Declare a C++ library
- add_library(talker 
+ add_library(${PROJECT_NAME} 
  src/talker.cpp
-# src/vel_talker.cpp
-# src/joint_talker.cpp
-# src/wrist_talker.cpp
+ src/vel_talker.cpp
+ src/joint_talker.cpp
+ src/wrist_talker.cpp
  )
- add_library(vel_talker src/vel_talker.cpp)
- add_library(joint_talker src/joint_talker.cpp)
- add_library(wrist_talker src/wrist_talker.cpp)
+
 
 add_executable(server src/server.cpp)
 add_executable(talker_node  src/talker_node.cpp )
@@ -100,16 +98,12 @@ add_dependencies(joint_node dynamic_tutorials_gencfg dynamic_tutorials_generate_
 
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(talker ${catkin_LIBRARIES})
-target_link_libraries(vel_talker ${catkin_LIBRARIES})
-target_link_libraries(joint_talker ${catkin_LIBRARIES})
-target_link_libraries(wrist_talker ${catkin_LIBRARIES})
-
+target_link_libraries(${PROJECT_NAME}   ${catkin_LIBRARIES} )
 target_link_libraries(server ${catkin_LIBRARIES})
-target_link_libraries(talker_node ${catkin_LIBRARIES} talker)
-target_link_libraries(talker_node_2 ${catkin_LIBRARIES} talker)
-target_link_libraries(vel_node ${catkin_LIBRARIES} vel_talker)
-target_link_libraries(joint_node ${catkin_LIBRARIES} joint_talker)
+target_link_libraries(talker_node ${catkin_LIBRARIES} dynamic_tutorials)
+target_link_libraries(talker_node_2 ${catkin_LIBRARIES} dynamic_tutorials)
+target_link_libraries(vel_node ${catkin_LIBRARIES} dynamic_tutorials)
+target_link_libraries(joint_node ${catkin_LIBRARIES} dynamic_tutorials)
 
 #############
 ## Install ##

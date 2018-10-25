@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <ros/time.h>
 
-//#include <dynamic_tutorials/NodeExampleData.h>
+#include <dynamic_tutorials/NodeExampleData.h>
 
 #include<dynamic_reconfigure/server.h>
 
