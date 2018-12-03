@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(beginner_tutorials)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+ add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -108,8 +108,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-  LIBRARIES beginner_tutorials
+  INCLUDE_DIRS include 
+  LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS roscpp rospy std_msgs nodelet
 #  DEPENDS system_lib
 )
@@ -121,14 +121,17 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
- add_library(nodelet_mavro
-   src/hello_mavro.cpp
- )
+ add_library(nodelet_mavro   src/hello_mavro.cpp )
+add_library(Serial_soft   src/Serial_soft.cpp )
+ add_library(Messenger   src/Messenger.cpp )
+ add_dependencies(Messenger ${catkin_EXPORTED_TARGETS})
+ add_dependencies(Serial_soft ${catkin_EXPORTED_TARGETS})
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -156,7 +159,16 @@ add_executable(vel1_ballbot src/ballbot/vel1_ballbot.cpp)
 add_executable(vel2_ballbot src/ballbot/vel2_ballbot.cpp)
 add_executable(vel3_ballbot src/ballbot/vel3_ballbot.cpp)
 add_executable(ballbot_gabriel src/ballbot/ballbot_gabriel.cpp)
+
+add_executable(serial src/Serial_main.cpp)
+ add_dependencies(serial ${catkin_EXPORTED_TARGETS})
+
+add_executable(serial_class src/Serial_class.cpp)
+ add_dependencies(serial_class ${catkin_EXPORTED_TARGETS})
+
+
 ## Rename C++ executable without prefix
+
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
@@ -170,9 +182,11 @@ add_executable(ballbot_gabriel src/ballbot/ballbot_gabriel.cpp)
 
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(nodelet_mavro
-   ${catkin_LIBRARIES}
- )
+ target_link_libraries(nodelet_mavro    ${catkin_LIBRARIES}  )
+ target_link_libraries(Serial_soft   ${catkin_LIBRARIES}  )
+ target_link_libraries(Messenger    ${catkin_LIBRARIES} ) 
+ target_link_libraries(serial   ${catkin_LIBRARIES} Messenger Serial_soft)
+ target_link_libraries(serial_class   ${catkin_LIBRARIES} Messenger Serial_soft)
  #target_link_libraries(teleoperation_base   ${catkin_LIBRARIES} )
  target_link_libraries(encoder   ${catkin_LIBRARIES} )
  target_link_libraries(joy2twist ${catkin_LIBRARIES})

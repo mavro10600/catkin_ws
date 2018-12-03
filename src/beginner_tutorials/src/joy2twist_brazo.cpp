@@ -201,16 +201,14 @@ void RobotDriver::update()
 		joy_base=0;
 		joy_shoulder=0;
 		joy_elbow=0;
-		joy_roll=0;
+//		joy_roll=0;
 		}		
 		if (!stat_LBbutton)
 		{
 		joy_pitch=0;
+//		joy_yaw=0;
 		}
-		if (!stat_RBbutton)
-		{
-		joy_yaw=0;
-		}
+
 		
 		flip1.data=int(joy_flipper1);
 		flip2.data=int(joy_flipper2);
@@ -351,7 +349,7 @@ if((RAVstick < sens && RAVstick> -sens) && LBbutton && RBbutton)
 
 if((RAHstick > sens || RAHstick < -sens ) && LBbutton && RBbutton)
 {
-joy_roll=-64*RAVstick;
+joy_roll=-64*RAHstick;
 }
 
 if((RAHstick < sens && RAHstick> -sens) && LBbutton && RBbutton)
