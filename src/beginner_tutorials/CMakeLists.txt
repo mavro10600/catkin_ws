@@ -127,7 +127,7 @@ include_directories(
 
 ## Declare a C++ library
  add_library(nodelet_mavro   src/hello_mavro.cpp )
-add_library(Serial_soft   src/Serial_soft.cpp )
+ add_library(Serial_soft   src/Serial_soft.cpp )
  add_library(Messenger   src/Messenger.cpp )
  add_dependencies(Messenger ${catkin_EXPORTED_TARGETS})
  add_dependencies(Serial_soft ${catkin_EXPORTED_TARGETS})
@@ -159,6 +159,8 @@ add_executable(vel1_ballbot src/ballbot/vel1_ballbot.cpp)
 add_executable(vel2_ballbot src/ballbot/vel2_ballbot.cpp)
 add_executable(vel3_ballbot src/ballbot/vel3_ballbot.cpp)
 add_executable(ballbot_gabriel src/ballbot/ballbot_gabriel.cpp)
+
+add_executable(conversor src/conversor.cpp)
 
 add_executable(serial src/Serial_main.cpp)
  add_dependencies(serial ${catkin_EXPORTED_TARGETS})
@@ -202,6 +204,8 @@ add_executable(serial_class src/Serial_class.cpp)
   target_link_libraries(vel2_ballbot ${catkin_LIBRARIES})
   target_link_libraries(vel3_ballbot ${catkin_LIBRARIES})
   target_link_libraries(ballbot_gabriel ${catkin_LIBRARIES})
+  
+   target_link_libraries(conversor ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############

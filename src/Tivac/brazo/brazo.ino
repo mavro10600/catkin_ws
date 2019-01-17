@@ -67,11 +67,13 @@ Loop
 */
 //Redefinimos los pines esclavo de la comunicación SPI
 
-#define pincsn1 PA_3
-#define pincsn2 PE_3
-#define pincsn3 PE_2
+//#define pincsn1 PE_2
+//#define pincsn2 PE_3
+//#define pincsn3 PA_3
 
-
+const int pincsn1 = PE_2;//creo que este pi no es necesario en el as5043
+const int pincsn2 = PE_3; //pin de seleccion de esclavo :)
+const int pincsn3 = PA_3; //pin de seleccion de esclavo :)
 
 //Definicion de los endstop
 /*
@@ -189,7 +191,7 @@ Wire.begin();
   Serial2.begin(38400);
   //rc.begin(38400);
   Serial3.begin(38400);
-  //SetupEncoders();
+  SetupEncoders();
   
   SetupMotors();
   
@@ -205,6 +207,7 @@ void SetupEncoders()
 pinMode(pincsn1,OUTPUT);  
 pinMode(pincsn2,OUTPUT);  
 pinMode(pincsn3,OUTPUT);  
+
 }
 
 void SetupMotors()
@@ -268,7 +271,7 @@ void loop() {
   Update_Motors();  
   Update_Encoders();
   Update_Endstops();
-  delay(20);
+  delay(100);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -384,20 +387,21 @@ void Update_Encoders()
  flip3_lec=encoder_digital(pindo3,pinclk3,pincsn3,&last_lec3,&vueltas3,&stat3);
  flip4_lec=encoder_digital(pindo4,pinclk4,pincsn4,&last_lec4,&vueltas4,&stat4);
 */
-shoulder_lec=0;
-elbow_lec=0;
+//shoulder_lec=0;
+//elbow_lec=0;
 
+elbow_lec=encoder(2,pincsn3);
+base_lec=encoder(2,pincsn1);
+shoulder_lec=encoder(2,pincsn2);
+//int angle=encoder(2,pincsn1);
 
-//shoulder_lec=encoder(2,pincsn1);
-//elbow_lec=encoder(2,pincsn2);
-
- Serial.print("e");
+  Serial.print("e");
   Serial.print("\t");
-  Serial.print(base_out);
+  Serial.print(base_lec>>6);
   Serial.print("\t");
-  Serial.print(shoulder_out);
+  Serial.print(shoulder_lec>>6);
   Serial.print("\t");
-  Serial.print(elbow_out);
+  Serial.print(elbow_lec>>6);
   Serial.print("\t");
   Serial.print(roll_out);
   Serial.print("\t");

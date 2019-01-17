@@ -9,6 +9,7 @@
 #include "std_msgs/Int32.h"
 #include </usr/include/boost/thread.hpp>
 #include <math.h>
+#include "std_msgs/Int16.h"
 
 static volatile int is_signaled=0;
 static jmp_buf  jmp_exit;
@@ -24,7 +25,7 @@ void sigint_handler(int signo)
 class SerialClass : public Messenger, public SerialSoft
 {
 	public:
-	
+		boost::mutex mutex;
 		SerialSoft Serial;
 		Messenger Messenger_Handler=Messenger();
 		SerialClass();					
@@ -32,9 +33,9 @@ class SerialClass : public Messenger, public SerialSoft
 		void thread_1();
 	private:
 		ros::NodeHandle n;
-		ros::Subscriber alive_sub;		
+		ros::Publisher alive_pub;		
 		ros::Publisher number_pub;
-		bool alive=true;		
+		bool alive_flag=true;		
 	//variables asociadas al tiempo
 		ros::Duration t_delta;	
 		ros::Time t_next;		
@@ -42,7 +43,7 @@ class SerialClass : public Messenger, public SerialSoft
 		ros::Time current_time,last_time;				
 		int counter=0;
 		int left_out, right_out;
-		
+		long  alive_int;
 		char cinco = '5';
 		char nueve = '9';
 		char space = ' ';
@@ -63,17 +64,13 @@ SerialClass::SerialClass() : SerialSoft(),	Messenger()
 
 	init_variables();
 //iniciar publicadores y suscriptores	
-	number_pub = n.advertise<std_msgs::Int32>("Numbers", 1);
-	alive_sub= n.subscribe <std_msgs::Bool>("Alive", 1, &SerialClass::alive_callback, this);
+	number_pub = n.advertise<std_msgs::Int32>("Numbers", 1000);
+	alive_pub= n.advertise <std_msgs::Int16>("Alive", 1);
 //	Messenger_Handler.attach(&SerialClass::OnMssageCompleted);
 //	offset_right_Sub=n.subscribe("offset",10,&Odometry_calc::offset_right_Cb,this);	
 //	odom_pub=n.advertise<nav_msgs::Odometry>("odom",50);	
 }
 
-void SerialClass::alive_callback(const std_msgs::Bool::ConstPtr& msg)
-{
-  ROS_INFO("Alive_callback");  
-}
 
 void SerialClass::OnMssageCompleted()
 {  
@@ -81,6 +78,7 @@ void SerialClass::OnMssageCompleted()
   char reset[] = "r";
   char set_speed[] = "s";
   char set_flippers[]="f";
+  char alive[]="a";
   
   if(Messenger_Handler.checkString(reset))
   {
@@ -88,7 +86,9 @@ void SerialClass::OnMssageCompleted()
 	left_out=Messenger_Handler.readInt();
 	right_out=Messenger_Handler.readInt();
 	std_msgs::Int32 num;
+//	mutex.lock();
 	num.data=counter;
+//	mutex.unlock();
 	number_pub.publish(num);	
   }
   if(Messenger_Handler.checkString(set_speed))
@@ -106,7 +106,16 @@ void SerialClass::OnMssageCompleted()
 //     Set_Flippers();
      return; 
 	}
-  
+  if(Messenger_Handler.checkString(alive))
+  {
+  	msg_comp=true;
+	alive_int=Messenger_Handler.readLong();
+   	std::cout <<"Alive: "<<alive_int<<"\n" ;    
+	std_msgs::Int16 alive_data;
+	alive_data.data=alive_int;
+	alive_pub.publish(alive_data);
+     return; 
+	}
 } //end OnMsgCompleted
 
 
@@ -126,7 +135,6 @@ void SerialClass::thread_1()
 	Serial.begin("/dev/ttyACM0",9600);
 	Serial.is_signaled= is_signaled;
 
-//	Messenger_Handler.attach(this->OnMssageCompleted);
 	while (ros::ok())
 	{
 	if (counter==5){	
@@ -134,10 +142,8 @@ void SerialClass::thread_1()
 	strcpy(cstr, cadena1.c_str());
 	Serial.writebuf(cstr, strlen(cstr));
 				}
-
-	
 	int temp;
-	
+
 	do
 	{
 	temp = Serial.read();
@@ -153,7 +159,11 @@ void SerialClass::thread_1()
 //	cout<<"data: "<<temp <<"\n";
 	Messenger_Handler.process(temp); 
     if ( Messenger_Handler.messageState == 1 )
-    {this->OnMssageCompleted();}
+    {
+    mutex.lock();
+    this->OnMssageCompleted();
+    mutex.unlock();
+    }
 	if (msg_comp)
 		{
 	std::cout << "is_signaled: "<<ros::ok()<<"\n";
@@ -164,7 +174,6 @@ void SerialClass::thread_1()
 	
 		}
 	counter++;
-	
 	if (counter==9){	
 	char cstr[cadena2.size() +1];
 	strcpy(cstr, cadena2.c_str());
