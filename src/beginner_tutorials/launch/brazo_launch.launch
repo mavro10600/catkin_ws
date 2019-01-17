@@ -1,0 +1,13 @@
+<launch>
+
+<node pkg="beginner_tutorials" type="joy2twist_brazo" name="joy2twist" output="screen"/>
+
+
+<node pkg="beginner_tutorials" type="conversor" name="conversor" output="screen">
+</node> 
+
+<node name="base_node" pkg="beginner_tutorials" type="brazo_node.py">
+<!--rosparam file="$(find beginner_tutorials)/param/board_base_config.yaml" command="load" /-->
+</node>
+
+</launch>

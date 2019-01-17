@@ -83,7 +83,7 @@ void Conversor::baseEncoderCb(const std_msgs::Int16::ConstPtr& base)
 {
 //	ROS_INFO("calllback");
 	base_lec=base->data;
-	base_val=(base_lec*3.1416/200) - 5*3.1416/4;	
+	base_val=(base_lec*3.1416/244) - 3.2188;	
 	std_msgs::Float32 base_conv;
 	std_msgs::Float32 base_deg;
 	base_deg.data=base_val*180/3.1416;
@@ -96,7 +96,7 @@ void Conversor::shoulderEncoderCb(const std_msgs::Int16::ConstPtr& shoulder)
 {
 //	ROS_INFO("calllback");
 	shoulder_lec=shoulder->data;
-	shoulder_val=(shoulder_lec*3.1416/200)-3.1416/2;	
+	shoulder_val=(shoulder_lec*3.1416/244)-1.2928;	
 	std_msgs::Float32 shoulder_conv;
 	std_msgs::Float32 shoulder_deg;
 	shoulder_deg.data=shoulder_val*180/3.1416;
@@ -109,7 +109,7 @@ void Conversor::elbowEncoderCb(const std_msgs::Int16::ConstPtr& elbow)
 {
 //	ROS_INFO("calllback");
 	elbow_lec=elbow->data;
-	elbow_val=(elbow_lec*3.1416/200) - 7*3.1416/5;	
+	elbow_val=(elbow_lec*3.1416/244) - 3.6135;	
 	std_msgs::Float32 elbow_conv;
 	std_msgs::Float32 elbow_deg;
 	elbow_deg.data=elbow_val*180/3.1416;
