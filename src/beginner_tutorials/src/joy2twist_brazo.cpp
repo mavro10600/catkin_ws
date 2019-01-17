@@ -30,6 +30,9 @@ class RobotDriver
 	private:
 	ros::NodeHandle n;
 	ros::Subscriber joy_sub;//suscriptor al control xbox
+	ros::Subscriber base_sub;
+	ros::Subscriber shoulder_sub;
+	ros::Subscriber elbow_sub;
 
 	ros::Publisher cmd_vel_pub;//publicar un mensaje tipo twist para manejar la base
 	ros::Publisher cmd_arm_pub;//publicar un mensaje tipo twist para el brazo
@@ -80,13 +83,19 @@ class RobotDriver
 		
 		ros::Time current_time,last_time;
 	
+//variables de los encoders
+int base_lec;
+int shoulder_lec;
+int elbow_lec;
 //funciones
 	void update();
 	
 	void init_variables();
 	
 	void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
-	
+	void baseCallback(const std_msgs::Int16::ConstPtr& base);
+	void shoulderCallback(const std_msgs::Int16::ConstPtr& shoulder);
+	void elbowCallback(const std_msgs::Int16::ConstPtr& elbow);
 	
 	public:
 	
@@ -102,6 +111,10 @@ RobotDriver::RobotDriver()
 	init_variables();
 
 	joy_sub=n.subscribe("/joy",10,&RobotDriver::joyCallback,this);
+	base_sub=n.subscribe("/base_lec",1,&RobotDriver::baseCallback, this);
+	shoulder_sub=n.subscribe("/shoulder_lec",1,&RobotDriver::shoulderCallback, this);
+	elbow_sub=n.subscribe("/elbow_lec",1,&RobotDriver::elbowCallback, this);
+
 	cmd_vel_pub=n.advertise<geometry_msgs::Twist>("/base_controller/command",1);
 	cmd_arm_pub=n.advertise<geometry_msgs::Twist>("/arm_controller/command",1);
 	/*cmd_vel_fl1=n.advertise<geometry_msgs::Twist>("/base_controller/flipper1",1);
@@ -158,6 +171,9 @@ void RobotDriver::init_variables()
 	current_time=ros::Time::now();
 	last_time=ros::Time::now();
 /////////////////////////////////
+	base_lec=0;
+	shoulder_lec=0;
+	elbow_lec=0;
 }
 
 void RobotDriver::spin()
@@ -269,6 +285,21 @@ void RobotDriver::update()
 	{;}
 }
 
+void RobotDriver::baseCallback(const std_msgs::Int16::ConstPtr& base)
+{
+base_lec=base->data;
+}
+
+void RobotDriver::shoulderCallback(const std_msgs::Int16::ConstPtr& shoulder)
+{
+shoulder_lec= shoulder->data;
+}
+
+void RobotDriver::elbowCallback(const std_msgs::Int16::ConstPtr& elbow)
+{
+elbow_lec=elbow->data;
+}
+
 void RobotDriver::joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
 float sens=0.2;
 
@@ -317,7 +348,14 @@ if(DpadH < sens && DpadH > -sens && !(LAHstick > sens || LAHstick < -sens))
 
 if((LAVstick > sens || LAVstick < -sens ) && LBbutton && RBbutton)
 {
-joy_shoulder=LAVstick*64;
+	//joy_shoulder=LAVstick*64;
+if (shoulder_lec < 20 && LAVstick > 0){joy_shoulder=0;}
+if (shoulder_lec > 180 && LAVstick < 0){joy_shoulder=0;}
+if (shoulder_lec < 20 && LAVstick < 0){joy_shoulder=LAVstick*64;}
+if (shoulder_lec > 180 && LAVstick > 0){joy_shoulder=LAVstick*64;}
+if (shoulder_lec >= 20 && shoulder_lec <= 180 ){joy_shoulder=LAVstick*64;}
+ROS_INFO_STREAM("lec:" << shoulder_lec << " joy: " << joy_shoulder);
+
 }
 
 if((LAVstick < sens && LAVstick> -sens) && LBbutton && RBbutton)
@@ -327,7 +365,14 @@ if((LAVstick < sens && LAVstick> -sens) && LBbutton && RBbutton)
 
 if((LAHstick > sens || LAHstick < -sens) && LBbutton && RBbutton)
 {
-	joy_elbow=-LAHstick*64;
+//	joy_elbow=-LAHstick*64;
+if (elbow_lec < 250 && LAHstick < 0){joy_elbow=0;}
+if (elbow_lec > 350 && LAHstick > 0){joy_elbow=0;}
+if (elbow_lec < 250 && LAHstick > 0){joy_elbow=-LAHstick*30;}
+if (elbow_lec > 350 && LAHstick < 0){joy_elbow=-LAHstick*30;}
+if (elbow_lec >= 250 && elbow_lec <= 350 ){joy_elbow=-LAHstick*30;}
+ROS_INFO_STREAM("lec:" << elbow_lec << " joy: " << joy_elbow);
+
 }
 
 if((LAHstick < sens && LAHstick > -sens) && LBbutton && RBbutton)
@@ -339,7 +384,13 @@ if((LAHstick < sens && LAHstick > -sens) && LBbutton && RBbutton)
 
 if((RAVstick > sens || RAVstick < -sens ) && LBbutton && RBbutton)
 {
-joy_base=RAVstick*500;
+if (base_lec < 150 && RAVstick > 0){joy_base=0;}
+if (base_lec > 360 && RAVstick < 0){joy_base=0;}
+if (base_lec < 150 && RAVstick < 0){joy_base=RAVstick*500;}
+if (base_lec > 360 && RAVstick > 0){joy_base=RAVstick*500;}
+if (base_lec >= 150 && base_lec <= 360 ){joy_base=RAVstick*500;}
+ROS_INFO_STREAM("lec:" << base_lec << " joy: " << joy_base);
+
 }
 
 if((RAVstick < sens && RAVstick> -sens) && LBbutton && RBbutton)
