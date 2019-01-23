@@ -26,7 +26,7 @@ class SerialClass : public Messenger, public SerialSoft
 {
 	public:
 		boost::mutex mutex;
-		SerialSoft Serial;
+//		SerialSoft Serial;
 		Messenger Messenger_Handler=Messenger();
 		SerialClass();					
 		void spin();
@@ -48,7 +48,7 @@ class SerialClass : public Messenger, public SerialSoft
 		char nueve = '9';
 		char space = ' ';
 		char nl='\n';
-		std::string cadena1="0 1 2 3 4 \n";
+		std::string cadena1="5\n";
 		std::string cadena2="5 6 7 8 9 \n";
 	
 			
@@ -64,7 +64,7 @@ SerialClass::SerialClass() : SerialSoft(),	Messenger()
 
 	init_variables();
 //iniciar publicadores y suscriptores	
-	number_pub = n.advertise<std_msgs::Int32>("Numbers", 1000);
+	number_pub = n.advertise<std_msgs::Int16>("Numbers", 1);
 	alive_pub= n.advertise <std_msgs::Int16>("Alive", 1);
 //	Messenger_Handler.attach(&SerialClass::OnMssageCompleted);
 //	offset_right_Sub=n.subscribe("offset",10,&Odometry_calc::offset_right_Cb,this);	
@@ -79,17 +79,29 @@ void SerialClass::OnMssageCompleted()
   char set_speed[] = "s";
   char set_flippers[]="f";
   char alive[]="a";
-  
+  std_msgs::Int16 num;
+  if(Messenger_Handler.checkString(alive))
+  {
+  	msg_comp=true;
+	alive_int=Messenger_Handler.readLong();
+   	std::cout <<"Alive: "<<alive_int<<"\n" ;    
+	std_msgs::Int16 alive_data;
+	alive_data.data=alive_int;
+	alive_pub.publish(alive_data);
+     return; 
+	}
+
   if(Messenger_Handler.checkString(reset))
   {
 	msg_comp=true;
 	left_out=Messenger_Handler.readInt();
 	right_out=Messenger_Handler.readInt();
-	std_msgs::Int32 num;
+	
 //	mutex.lock();
-	num.data=counter;
+	num.data=left_out;
 //	mutex.unlock();
 	number_pub.publish(num);	
+//	std::cout << left_out << "\n";
   }
   if(Messenger_Handler.checkString(set_speed))
   {
@@ -106,16 +118,7 @@ void SerialClass::OnMssageCompleted()
 //     Set_Flippers();
      return; 
 	}
-  if(Messenger_Handler.checkString(alive))
-  {
-  	msg_comp=true;
-	alive_int=Messenger_Handler.readLong();
-   	std::cout <<"Alive: "<<alive_int<<"\n" ;    
-	std_msgs::Int16 alive_data;
-	alive_data.data=alive_int;
-	alive_pub.publish(alive_data);
-     return; 
-	}
+
 } //end OnMsgCompleted
 
 
@@ -131,17 +134,23 @@ void SerialClass::spin()
 
 void SerialClass::thread_1()
 {
-
+	SerialSoft Serial;
 	Serial.begin("/dev/ttyACM0",9600);
 	Serial.is_signaled= is_signaled;
 
 	while (ros::ok())
 	{
-	if (counter==5){	
+
+/*	if (counter==5){	
 	char cstr[cadena1.size() +1];
 	strcpy(cstr, cadena1.c_str());
 	Serial.writebuf(cstr, strlen(cstr));
 				}
+*/
+/*	char cstr[cadena1.size() +1];
+	strcpy(cstr, cadena1.c_str());
+	Serial.writebuf(cstr, strlen(cstr));
+*/
 	int temp;
 
 	do
@@ -173,13 +182,6 @@ void SerialClass::thread_1()
 	msg_comp=false;
 	
 		}
-	counter++;
-	if (counter==9){	
-	char cstr[cadena2.size() +1];
-	strcpy(cstr, cadena2.c_str());
-	Serial.writebuf(cstr, strlen(cstr));
-	counter=0;
-		}	
 	}
 		Serial.end();
 }

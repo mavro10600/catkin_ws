@@ -41,8 +41,8 @@ set:		struct termios options;
 //		options.c_iflag |= IGNPAR | ;
 //		options.c_oflag = OPOST | ONLCR;
 //		options.c_lflag = 0;
-		options.c_cflag = speed | CS8 | CLOCAL | CREAD;
-		options.c_iflag = IGNPAR;
+		options.c_cflag = speed | CS8 | CREAD;
+		options.c_iflag = IGNPAR | INLCR;
 		options.c_oflag = 0;
 		options.c_lflag =0;
 //		options.c_cflag 
@@ -61,8 +61,8 @@ open:   uart0_fd=open(device.c_str(), O_RDWR | O_NOCTTY);
 		if ( rc < 0 ) {
 		perror("tcdrain(3)");}
 				cfmakeraw(&options);	
-		rc = tcflush(uart0_fd,TCIOFLUSH);
-		rc = tcsetattr(uart0_fd,TCSANOW,&options); 
+		
+		rc = tcsetattr(uart0_fd,TCSADRAIN,&options); 
 		if (rc >= 0)
 		{	
 			printf("error_setattr \n");
@@ -74,7 +74,7 @@ open:   uart0_fd=open(device.c_str(), O_RDWR | O_NOCTTY);
 			perror("tcsetattr(3)");
 //			goto open;
 		}
-
+		rc = tcflush(uart0_fd,TCIOFLUSH);
   // */      
 }
 void SerialSoft::flush()
