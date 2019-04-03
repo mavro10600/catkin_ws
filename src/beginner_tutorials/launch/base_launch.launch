@@ -17,7 +17,7 @@
 
 <remap from ="lec" to="left_lec"/> 
 <remap from ="offset" to="left_offset"/> 
-<remap from ="pos_des" to="left_pos_des"/>
+<remap from ="pos_des" to="left_vel_des"/>
 
 <remap from ="ang" to="left_pos"/> 
 <remap from ="vel" to="left_vel"/> 
@@ -39,7 +39,7 @@
 
 <remap from ="lec" to="right_lec"/> 
 <remap from ="offset" to="right_offset"/> 
-<remap from ="pos_des" to="right_pos_des"/>
+<remap from ="pos_des" to="right_vel_des"/>
 
 <remap from ="ang" to="right_pos"/> 
 <remap from ="vel" to="right_vel"/> 
