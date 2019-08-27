@@ -6,11 +6,11 @@
 
 <node pkg="beginner_tutorials" type="joy2twist" name="joy2twist" output="screen"/>
 
-
-<!--node name="base_node" pkg="beginner_tutorials" type="base_node.py"-->
-<!--rosparam file="$(find beginner_tutorials)/param/board_base_config.yaml" command="load" /-->
-<!--/node-->
-
+<!--
+<node name="base_node" pkg="beginner_tutorials" type="base_node.py">
+<rosparam file="$(find beginner_tutorials)/param/board_base_config.yaml" command="load" />
+</node>
+-->
 
 
 <node pkg="beginner_tutorials" type="vel_ctrl" name="l_vel" output="screen">
@@ -35,6 +35,8 @@
 
 </node>
 
+
+<!--
 <node pkg="beginner_tutorials" type="vel_ctrl" name="r_vel" output="screen">
 
 <remap from ="lec" to="right_lec"/> 
@@ -56,8 +58,7 @@
 <rosparam param ="kisum_vel">0</rosparam>
 
 </node>
-
-
+-->
 <node pkg="beginner_tutorials" type="twist2motor" name="twist2motor" output="screen"/>
 
 <!--node pkg="beginner_tutorials" type="diff_odom" name="diff_odom" output="screen"/--> 

@@ -71,7 +71,7 @@ Loop
 #define pincsn4 PB_1
 #define pincsn5 PB_0
 #define pincsn6 PB_5
-
+//Usamos el canal de SPI 2
 
 
 //Definicion de los endstop
@@ -434,17 +434,17 @@ flip4_lec=encoder(2,pincsn6);
 
  Serial.print("e");
   Serial.print("\t");
-  Serial.print(left_lec>>6);
+  Serial.print(left_lec>>5);
   Serial.print("\t");
-  Serial.print(right_lec>>6);
+  Serial.print(right_lec>>5);
   Serial.print("\t");
-  Serial.print(flip1_lec>>6);
+  Serial.print(flip1_lec>>5);
   Serial.print("\t");
-  Serial.print(flip2_lec>>6);
+  Serial.print(flip2_lec>>5);
   Serial.print("\t");
-  Serial.print(flip3_lec>>6);
+  Serial.print(flip3_lec>>5);
   Serial.print("\t");
-  Serial.print(flip4_lec>>6);
+  Serial.print(flip4_lec>>5);
   Serial.print("\n");
 }
 
@@ -563,8 +563,8 @@ unsigned int encoder(int bytesToRead, int pin)
   byte inByte = 0;           // incoming byte from the SPI
   unsigned int result = 0;   // result to return
   digitalWrite(pin, LOW);
-  result = SPI.transfer(0x00);
-  bytesToRead--;
+  result = SPI.transferAS5043();
+ /* bytesToRead--;
   if (bytesToRead > 0) 
   {
     result = result << 8;
@@ -573,7 +573,7 @@ unsigned int encoder(int bytesToRead, int pin)
     result = result | inByte;
     // decrement the number of bytes left to read:
     bytesToRead--;
-  }
+  }*/
   // take the chip select high to de-select:
   digitalWrite(pin, HIGH);
   // return the result:

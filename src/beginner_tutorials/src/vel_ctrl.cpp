@@ -71,7 +71,9 @@ class PID_control
 		int lec;
 		double ang;
 		double vel;
-		
+		double change;
+        double incremento;
+        		
 		int enc_max;
 		int offset;
 		
@@ -165,6 +167,7 @@ std::cout<<name_nodo<<std::endl;
 		kisum_pos=0;
 		error_pos=0;
 
+
 		kp_vel=30;
 		ki_vel=1;
 		kd_vel=0;
@@ -186,7 +189,9 @@ std::cout<<name_nodo<<std::endl;
 		
 		enc_max=1023;
 		offset=0;
-		
+		change=0;
+		incremento=0;
+				
 		ang_tmp;
 		ang_lst=0;
 		ang_abs=0;
@@ -278,7 +283,9 @@ void PID_control::update()
 
 		//if(abs(vel)>.1)
 //		vel=vel/elapsed;  velocidad angular, pero el target vine en velocidad lineal
-		vel=(ang-ang_lap_lst)*.05/elapsed; 
+
+                vel=+(ang-ang_lap_lst)/elapsed;
+		if (fabs(vel)> 1.2) vel=0;
 		//else
 		//vel=0;		
 //		ROS_DEBUG("vel: %0.2f",vel);		
@@ -319,7 +326,7 @@ void PID_control::update()
 	//ROS_DEBUG("vel: %0.2f tar: %0.2f err:%0.2f kisum: %0.2f left_out: %0.2f ticks:%d",vel,left_ang_des,error_vel,kisum_vel,left_out,ticks_since_target);		
 	
 	ROS_INFO_STREAM("Vel" << vel);
-	ROS_INFO_STREAM("Tar" << ang_des);
+/*	ROS_INFO_STREAM("Tar" << ang_des);
 
 	ROS_INFO_STREAM("Err"<< error_vel);
 	ROS_INFO_STREAM("kisum" << kisum_vel);
@@ -328,7 +335,7 @@ void PID_control::update()
 
 	ROS_INFO_STREAM("out" << out);
 	ROS_INFO_STREAM("ticks" << ticks_since_target);
-
+*/
 		//end of pid
 	ticks_since_target+=1;
 		
@@ -366,20 +373,23 @@ void PID_control::leftencoderCb(const std_msgs::Int16::ConstPtr& left)
 	
 	times=times+1;
 	
-	offset_internal= (offset-0)*(0-2*M_PI+0)/(enc_max-0)+enc_max;
+	offset_internal= (offset-0)*(0-2*M_PI+0)/(enc_max-0);
 	
-	ang_tmp_internal=(lec-0)*(0-2*M_PI+0)/(enc_max-0)+enc_max;
+	ang_tmp_internal=(lec-0)*(0-2*M_PI+0)/(enc_max-0);
 	
 	ang_lst_internal=ang_abs_internal;
 	ang_abs_internal=ang_tmp_internal;
-	
+    change=(ang_abs_internal-ang_lst_internal);
+
+ROS_INFO_STREAM("ang_lst_internal: " << ang_lst_internal <<" ang_abs_internal:  " << ang_abs_internal<< "offset: " << offset << " times: " << times);
+		
 	if(times>4)
 	{
-		if(ang_abs_internal>1.7*M_PI && ang_lst_internal<0.3*M_PI)
+		if(fabs(ang_abs_internal) > 1.7*M_PI && fabs(ang_lst_internal) < 0.3*M_PI)
 		{
 			ang_lap-=1;
 		}
-				if(ang_abs_internal<0.3*M_PI && ang_lst_internal<1.7*M_PI)
+				if(fabs(ang_abs_internal) < 0.3*M_PI && fabs(ang_lst_internal) > 1.7*M_PI)
 		{
 			ang_lap+=1;
 		}
@@ -389,20 +399,21 @@ void PID_control::leftencoderCb(const std_msgs::Int16::ConstPtr& left)
 	//Aqui hacer la magia tomando en cuenta que es un encoder absoluto
 	
 	//prev_lencoder=enc;
-	
-	//ang_lap_lst=ang;
-	ang=2*M_PI*ang_lap+ang_abs_internal-offset_internal;
-	//vel=(ang-ang_lap_lst);
-	
+	ang_lap_lst=ang;
+	ang=2*M_PI*ang_lap + ang_abs_internal-offset_internal;
+    
+	ROS_INFO_STREAM("ang_lap_lst: " << ang_lap_lst <<" ang:  " << ang << "ang_lap" << ang_lap );
 }
 
 void PID_control::offsetCb(const std_msgs::Int16::ConstPtr& offst)
 {
-	int offset=offst->data;
-	
-	if(offset==1)
+	int offset_local=offst->data;
+	ROS_INFO_STREAM("offset_callback: ");	
+	if(offset_local==1)
 	{
+
 		offset=lec;
+		ROS_INFO_STREAM("offset_callback: " << offset<<"\n");
 		ang_tmp=0;
 		ang_lst=0;
 		ang_abs=0;

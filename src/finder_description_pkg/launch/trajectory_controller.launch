@@ -1,0 +1,7 @@
+<launch>
+	<rosparam file="$(find finder_description_pkg)/param/arm_trajectory_control.yaml" command="load"/>
+
+  <node name="finder_arm__spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/Finder_arm" args="Finder_arm_joint_controller 						      gripper_controller"/>
+
+</launch>

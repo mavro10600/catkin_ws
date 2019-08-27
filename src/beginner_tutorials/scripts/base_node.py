@@ -10,6 +10,7 @@ import rospy
 import sys
 import time
 import math
+import io
 
 from SerialDataGateway import SerialDataGateway
 from std_msgs.msg import Int16,Int32,Int64,Float32,String,Header,UInt64
@@ -20,7 +21,7 @@ from std_msgs.msg import Int16,Int32,Int64,Float32,String,Header,UInt64
 class Launchpad_Class(object):
 	
 	def __init__(self):
-		print "Iniciando clase launchpad"
+		print ("Iniciando clase launchpad")
 		
 ######################################
 #Variables de los sensores		
@@ -94,54 +95,57 @@ class Launchpad_Class(object):
 		self._left_wheel_speed=left_speed.data
 		#rospy.loginfo(left_speed.data)
 		speed_message='s %d %d \r' %(int(self._left_wheel_speed),int(self._right_wheel_speed))	
-		self._WriteSerial(speed_message)
+		self._WriteSerial(str.encode(speed_message))
 		
 	def _Update_Right_Speed(self,right_speed):
 		self._right_wheel_speed=right_speed.data
 		#rospy.loginfo(right_speed.data)
 		speed_message='s %d %d \r' %(int(self._left_wheel_speed),int(self._right_wheel_speed))	
-		self._WriteSerial(speed_message)
+		self._WriteSerial(str.encode(speed_message))
 		
 
 	def _Update_Flipper1_Speed(self,flipper1_speed):
                 self._flipper1_wheel_speed=flipper1_speed.data
                 #rospy.loginfo(flipper1_speed.data)
-                speed_message='f %d %d %d %d\r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
-                self._WriteSerial(speed_message)
+                speed_message='f %d %d %d %d \r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
+                self._WriteSerial(str.encode(speed_message))
 
 	def _Update_Flipper2_Speed(self,flipper2_speed):
                 self._flipper2_wheel_speed=flipper2_speed.data
                 #rospy.loginfo(flipper2_speed.data)
-                speed_message='f %d %d %d %d\r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
-                self._WriteSerial(speed_message)
+                speed_message='f %d %d %d %d \r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
+                self._WriteSerial(str.encode(speed_message))
 
 	def _Update_Flipper3_Speed(self,flipper3_speed):
                 self._flipper3_wheel_speed=flipper3_speed.data
                 #rospy.loginfo(flipper3_speed.data)
-                speed_message='f %d %d %d %d\r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
-                self._WriteSerial(speed_message)
+                speed_message='f %d %d %d %d \r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
+                self._WriteSerial(str.encode(speed_message))
 
 	def _Update_Flipper4_Speed(self,flipper4_speed):
                 self._flipper4_wheel_speed=flipper4_speed.data
                 #rospy.loginfo(flipper4_speed.data)
-                speed_message='f %d %d %d %d\r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
-                self._WriteSerial(speed_message)
+                speed_message='f %d %d %d %d \r' %(int(self._flipper1_wheel_speed),int(self._flipper2_wheel_speed),int(self._flipper3_wheel_speed),int(self._flipper4_wheel_speed))
+                self._WriteSerial(str.encode(speed_message))
 
 
 	def _HandleReceivedLine(self,line):	
 		self._Counter=self._Counter+1
 		self._SerialPublisher.publish(String(str(self._Counter)+", in:"+line))
-		
+		#print ('line: ',line)
+#		rospy.loginfo(line)
+
 		if(len(line)>0):
 			lineParts=line.split('\t')
 			try:
 				if(lineParts[0]=='e'):
-					self._left_encoder_value=long(lineParts[2])
-					self._right_encoder_value=long(lineParts[1])					
-					self._flipper1_encoder_value=long(lineParts[3])
-					self._flipper2_encoder_value=long(lineParts[4])					
-					self._flipper3_encoder_value=long(lineParts[5])
-					self._flipper4_encoder_value=long(lineParts[6])					
+					self._left_encoder_value=int(lineParts[2])
+					self._right_encoder_value=int(lineParts[1])					
+					self._flipper1_encoder_value=int(lineParts[3])
+					self._flipper2_encoder_value=int(lineParts[4])					
+					self._flipper3_encoder_value=int(lineParts[5])
+					self._flipper4_encoder_value=int(lineParts[6])
+#					print("line2:",int(lineParts[1]))					
 
 					self._Left_Encoder.publish(self._left_encoder_value)
 					self._Right_Encoder.publish(self._right_encoder_value)
@@ -167,7 +171,7 @@ class Launchpad_Class(object):
 				pass
 
 	def _WriteSerial(self,message):
-		self._SerialPublisher.publish(String(str(self._Counter)+", out:"+message))
+		self._SerialPublisher.publish(String(str(self._Counter)+", out:"+str(message)))
 		self._SerialDataGateway.Write(message)
 		
 	def Start(self):
@@ -179,11 +183,11 @@ class Launchpad_Class(object):
 		self._SerialDataGateway.Stop()
 		
 	def Reset_Launchpad(self):
-		print "reset"
+		print ("reset")
 		reset='r\r'
-		self._WriteSerial(reset)
+		self._WriteSerial(str.encode(reset))
 		time.sleep(1)
-		self._WriteSerial(reset)
+		self._WriteSerial(str.encode(reset))
 		time.sleep(2)
 		
 	def SubscribeSpeed(self):
